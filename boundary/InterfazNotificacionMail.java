@@ -1,4 +1,4 @@
-package boundary.nehu;
+package boundary;
 
 public class InterfazNotificacionMail {
 

@@ -9,11 +9,11 @@ public class CambioEstado {
     private LocalDateTime fechaHoraFin;
 
     private Empleado responsable;
-    private List<MotivoFueraServicio> motivos;
+    private List<MotivoTipo> motivos;
     private Estado estado;
 
     public CambioEstado(String nombreEstado, LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin,
-                        Empleado responsable, List<MotivoFueraServicio> motivos, Estado estado) {
+                        Empleado responsable, List<MotivoTipo> motivos, Estado estado) {
         this.nombreEstado = nombreEstado;
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFin = fechaHoraFin;
@@ -22,14 +22,14 @@ public class CambioEstado {
         this.estado = estado;
     }
 
-    public void setFechaCambio(LocalDateTime fechaHoraFin) {
-        this.fechaHoraFin = CambioEstado.this.fechaHoraFin;
+    public void setFechaHoraFin(LocalDateTime fechaHoraFin) {
+        this.fechaHoraFin = fechaHoraFin;
     }
 
-    public void fueraDeServicio(Sismografo sismografo, List<MotivoFueraServicio> motivos, Empleado responsable) {
+    public void fueraDeServicio(Sismografo sismografo, List<MotivoTipo> motivos, Empleado responsable) {
         CambioEstado nuevoEstado = new CambioEstado(nombreEstado,fechaHoraInicio,fechaHoraFin,responsable,motivos,estado);
         nuevoEstado.nombreEstado = "Fuera de Servicio";
-        nuevoEstado.fechaHoraInicio = LocalDateTime.now();
+        setFechaHoraFin(LocalDateTime.now());
         nuevoEstado.responsable = responsable;
         nuevoEstado.motivos = motivos;
 

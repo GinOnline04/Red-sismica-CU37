@@ -10,8 +10,8 @@ import java.util.List;
 public class InterfazCerrarOrdenInspeccion extends JFrame {
     private JPanel panelPrincipal;
     private GestorTest gestor;
-    // private List<String> motivosDisponibles;
-    // private List<Pair<String, String>> motivosSeleccionadosConComentarios;
+    private InterfazNotificacionMail interfazNotificacionMail;
+    private InterfazMonitorCCRS interfazMonitorCCRS;
 
     public InterfazCerrarOrdenInspeccion() {
         super("Menú Principal");
@@ -44,7 +44,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.add(titulo, BorderLayout.CENTER);
         panelPrincipal.revalidate();
         panelPrincipal.repaint();
-        gestor = new GestorTest(this);
+        gestor = new GestorTest(this, interfazNotificacionMail, interfazMonitorCCRS);
         gestor.iniciarCierreOrdenInspeccion();
     }
 
@@ -79,10 +79,10 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.repaint();
     }
 
-//    public void tomarOrdenInspeccionSeleccionada(String numeroOrden) {
-//        gestor.tomarOrdenInspeccionSeleccionada(numeroOrden);
-//        pedirObservacionCierreOrden();
-//    }
+    public void tomarOrdenInspeccionSeleccionada(String numeroOrden) {
+        gestor.tomarOrdenInspeccionSeleccionada(numeroOrden);
+        pedirObservacionCierreOrden();
+    }
 
     public void pedirObservacionCierreOrden() {
         panelPrincipal.removeAll();
@@ -117,122 +117,122 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         gestor.tomarObservacionCierreOrden(texto.trim());
     }
 
-//    public void pedirSeleccionMotivoTipo(List<String> motivosTipo) {
-//        panelPrincipal.removeAll();
-//
-//        JLabel titulo = new JLabel("Seleccione un motivo para marcar fuera de servicio", SwingConstants.CENTER);
-//        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-//        panelPrincipal.add(titulo, BorderLayout.NORTH);
-//
-//        DefaultListModel<String> model = new DefaultListModel<>();
-//        for (String motivo : motivosTipo) {
-//            model.addElement(motivo);
-//        }
-//
-//        JList<String> listaMotivos = new JList<>(model);
-//        JScrollPane scrollMotivos = new JScrollPane(listaMotivos);
-//        panelPrincipal.add(scrollMotivos, BorderLayout.CENTER);
-//
-//        JButton btnSeleccionar = new JButton("Seleccionar motivo");
-//        btnSeleccionar.addActionListener(e -> {
-//            String motivoSeleccionado = listaMotivos.getSelectedValue();
-//            if (motivoSeleccionado != null) {
-//                tomarMotivoTipo(motivoSeleccionado);
-//            } else {
-//                JOptionPane.showMessageDialog(this, "Debe seleccionar un motivo.");
-//            }
-//        });
-//
-//        JButton btnFinalizar = new JButton("Finalizar selección de motivos");
-//        btnFinalizar.addActionListener(e -> gestor.pedirConfirmacionCierreOrden());
-//
-//        JPanel panelBotones = new JPanel();
-//        panelBotones.add(btnSeleccionar);
-//        panelBotones.add(btnFinalizar);
-//        panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
-//
-//        panelPrincipal.revalidate();
-//        panelPrincipal.repaint();
-//    }
+    public void pedirSeleccionMotivoTipo(List<MotivoTipo> motivosTipo) {
+        panelPrincipal.removeAll();
 
-//    public void tomarMotivoTipo(String motivo) {
-//        //gestor.tomarMotivoTipo(motivo); // notifica al gestor
-//        tomarComentario();    // habilita ingreso del comentario
-//    }
+        JLabel titulo = new JLabel("Seleccione un motivo para marcar fuera de servicio", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        panelPrincipal.add(titulo, BorderLayout.NORTH);
 
-//    public void tomarComentario() {
-//        panelPrincipal.removeAll();
-//
-//        JLabel titulo = new JLabel("Ingrese comentario para el motivo seleccionado", SwingConstants.CENTER);
-//        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-//        panelPrincipal.add(titulo, BorderLayout.NORTH);
-//
-//        JTextArea campoComentario = new JTextArea(10, 50);
-//        JScrollPane scrollPane = new JScrollPane(campoComentario);
-//        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
-//
-//        JButton btnConfirmar = new JButton("Confirmar comentario");
-//        btnConfirmar.addActionListener(e -> {
-//            String comentario = campoComentario.getText().trim();
-//            if (comentario.isEmpty()) {
-//                JOptionPane.showMessageDialog(this, "El comentario no puede estar vacío.");
-//            } else {
-//                //gestor.tomarComentario(comentario);
-//                // volvemos a mostrar la lista de motivos para seguir el ciclo
-//                gestor.pedirSeleccionarMotivosFueraServicio();
-//            }
-//        });
-//
-//        JPanel panelBoton = new JPanel();
-//        panelBoton.add(btnConfirmar);
-//        panelPrincipal.add(panelBoton, BorderLayout.SOUTH);
-//
-//        panelPrincipal.revalidate();
-//        panelPrincipal.repaint();
-//    }
+        DefaultListModel<String> model = new DefaultListModel<>();
+        for (MotivoTipo motivo : motivosTipo) {
+            model.addElement(String.valueOf(motivo));
+        }
 
-//    public void pedirConfirmacionCierreOrden() {
-//        panelPrincipal.removeAll();
-//
-//        JLabel titulo = new JLabel("¿Desea confirmar el cierre de la orden?", SwingConstants.CENTER);
-//        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-//        panelPrincipal.add(titulo, BorderLayout.NORTH);
-//
-//        JButton btnConfirmar = new JButton("Confirmar cierre orden");
-//        btnConfirmar.addActionListener(e -> {
-//            int respuesta = JOptionPane.showConfirmDialog(this,
-//                    "¿Está seguro que desea confirmar el cierre de la orden?",
-//                    "Confirmación",
-//                    JOptionPane.YES_NO_OPTION);
-//            if (respuesta == JOptionPane.YES_OPTION) {
-//                tomarConfirmacionCierreOrden(true);
-//            }
-//        });
-//
-//        JButton btnNoConfirmar = new JButton("No confirmar");
-//        btnNoConfirmar.addActionListener(e -> {
-//            int respuesta = JOptionPane.showConfirmDialog(this,
-//                    "¿Está seguro que desea cancelar el cierre de la orden?",
-//                    "Confirmación",
-//                    JOptionPane.YES_NO_OPTION);
-//            if (respuesta == JOptionPane.YES_OPTION) {
-//                tomarConfirmacionCierreOrden(false);
-//            }
-//        });
-//
-//        JPanel panelBotones = new JPanel();
-//        panelBotones.add(btnConfirmar);
-//        panelBotones.add(btnNoConfirmar);
-//
-//        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
-//
-//        panelPrincipal.revalidate();
-//        panelPrincipal.repaint();
-//    }
+        JList<String> listaMotivos = new JList<>(model);
+        JScrollPane scrollMotivos = new JScrollPane(listaMotivos);
+        panelPrincipal.add(scrollMotivos, BorderLayout.CENTER);
 
-//    public void tomarConfirmacionCierreOrden(boolean confirmacion){
-//        gestor.tomarConfirmacionCierreOrden(confirmacion);
-//    }
+        JButton btnSeleccionar = new JButton("Seleccionar motivo");
+        btnSeleccionar.addActionListener(e -> {
+            String motivoSeleccionado = listaMotivos.getSelectedValue();
+            if (motivoSeleccionado != null) {
+                tomarMotivoTipo(motivoSeleccionado, motivosTipo);
+            } else {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un motivo.");
+            }
+        });
+
+        JButton btnFinalizar = new JButton("Finalizar selección de motivos");
+        btnFinalizar.addActionListener(e -> gestor.pedirConfirmacionCierreOrden());
+
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnSeleccionar);
+        panelBotones.add(btnFinalizar);
+        panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    public void tomarMotivoTipo(String motivo, List<MotivoTipo> motivosTipo) {
+        gestor.tomarMotivoTipo(motivo, motivosTipo); // notifica al gestor
+        tomarComentario();    // habilita ingreso del comentario
+    }
+
+    public void tomarComentario() {
+        panelPrincipal.removeAll();
+
+        JLabel titulo = new JLabel("Ingrese comentario para el motivo seleccionado", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        panelPrincipal.add(titulo, BorderLayout.NORTH);
+
+        JTextArea campoComentario = new JTextArea(10, 50);
+        JScrollPane scrollPane = new JScrollPane(campoComentario);
+        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
+
+        JButton btnConfirmar = new JButton("Confirmar comentario");
+        btnConfirmar.addActionListener(e -> {
+            String comentario = campoComentario.getText().trim();
+            if (comentario.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El comentario no puede estar vacío.");
+            } else {
+                gestor.tomarComentario(comentario);
+                // volvemos a mostrar la lista de motivos para seguir el ciclo
+                //gestor.pedirSeleccionMotivoTipo(motivos);
+            }
+        });
+
+        JPanel panelBoton = new JPanel();
+        panelBoton.add(btnConfirmar);
+        panelPrincipal.add(panelBoton, BorderLayout.SOUTH);
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    public void pedirConfirmacionCierreOrden() {
+        panelPrincipal.removeAll();
+
+        JLabel titulo = new JLabel("¿Desea confirmar el cierre de la orden?", SwingConstants.CENTER);
+        titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        panelPrincipal.add(titulo, BorderLayout.NORTH);
+
+        JButton btnConfirmar = new JButton("Confirmar cierre orden");
+        btnConfirmar.addActionListener(e -> {
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro que desea confirmar el cierre de la orden?",
+                    "Confirmación",
+                    JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                tomarConfirmacionCierreOrden(true);
+            }
+        });
+
+        JButton btnNoConfirmar = new JButton("No confirmar");
+        btnNoConfirmar.addActionListener(e -> {
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Está seguro que desea cancelar el cierre de la orden?",
+                    "Confirmación",
+                    JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                tomarConfirmacionCierreOrden(false);
+            }
+        });
+
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnConfirmar);
+        panelBotones.add(btnNoConfirmar);
+
+        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    public void tomarConfirmacionCierreOrden(boolean confirmacion){
+        gestor.tomarConfirmacionCierreOrden(confirmacion);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new InterfazCerrarOrdenInspeccion().setVisible(true));

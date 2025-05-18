@@ -1,16 +1,19 @@
 package entity;
 
+public enum MotivoTipo {
+    FALLO_TECNICO("Fallo técnico"),
+    MANTENIMIENTO("Mantenimiento preventivo"),
+    FIRMWARE("Actualización de firmware"),
+    CONECTIVIDAD("Problemas de conectividad"),
+    RUTINA("Inspección de rutina");
 
-public class MotivoTipo {
+    private final String descripcion;
 
-    private String descripcion;
-
-    public MotivoTipo(String descripcion) {
+    MotivoTipo(String descripcion) {
         this.descripcion = descripcion;
     }
 
     public String getDescripcion() {
         return descripcion;
     }
-
 }

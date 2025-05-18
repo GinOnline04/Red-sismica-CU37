@@ -11,9 +11,9 @@ public class EstacionSismologica {
     private double longitud;
     private String nombreEstacion;
     private int nroCertificacionAdquisicion;
-    private String identificadorSismografo;
+    private Sismografo sismografo;
 
-    public EstacionSismologica(int codigoEstacion, String documentoCertificacionAdq, Date fechaSolicitudCertificacion, double latitud, double longitud, String nombreEstacion, int nroCertificacionAdquisicion, String identificadorSismografo) {
+    public EstacionSismologica(int codigoEstacion, String documentoCertificacionAdq, Date fechaSolicitudCertificacion, double latitud, double longitud, String nombreEstacion, int nroCertificacionAdquisicion, Sismografo sismografo) {
         this.codigoEstacion = codigoEstacion;
         this.documentoCertificacionAdq = documentoCertificacionAdq;
         this.fechaSolicitudCertificacion = fechaSolicitudCertificacion;
@@ -21,7 +21,7 @@ public class EstacionSismologica {
         this.longitud = longitud;
         this.nombreEstacion = nombreEstacion;
         this.nroCertificacionAdquisicion = nroCertificacionAdquisicion;
-        this.identificadorSismografo = identificadorSismografo;
+        this.sismografo = sismografo;
     }
 
     public int getCodigoEstacion() {
@@ -33,14 +33,17 @@ public class EstacionSismologica {
     }
 
     public String getIdentificadorSismografo() {
-        return identificadorSismografo;
+        return sismografo.getIdentificadorSismografo();
     }
 
-    public void ponerSismografoFueraDeServicio(Sismografo sismografo, List<MotivoFueraServicio> motivos, Empleado responsable) {
-        if (!sismografo.getIdentificadorSismografo().equals(this.identificadorSismografo)) {
-            throw new IllegalArgumentException("El sismógrafo proporcionado no coincide con el asociado a esta estación.");
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable) {
+        for (Sismografo sismografo : sismografos) {
+            if (sismografo.getIdentificadorSismografo().equals(this.getIdentificadorSismografo())) {
+                sismografo.fueraDeServicio(motivos, responsable);
+                return; // Se asume que el identificador es único, por eso se puede salir del loop
+            }
         }
 
-        sismografo.fueraDeServicio(motivos, responsable);
+        System.out.println("No se encontró un sismógrafo con el identificador: " + this.getIdentificadorSismografo());
     }
 }

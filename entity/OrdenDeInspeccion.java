@@ -8,14 +8,14 @@ public class OrdenDeInspeccion {
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFinalizacion;
     private LocalDateTime fechaHoraCierre;
-    private int numeroOrden;
+    private String numeroOrden;
     private String observacionCliente;
 
     private Empleado empleado;
     private EstacionSismologica estacion;
     private Estado estado;
 
-    public OrdenDeInspeccion(int numeroOrden, LocalDateTime fechaHoraInicio, Empleado empleado, EstacionSismologica estacion, Estado estado) {
+    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, Empleado empleado, EstacionSismologica estacion, Estado estado) {
         this.numeroOrden = numeroOrden;
         this.fechaHoraInicio = fechaHoraInicio;
         this.empleado = empleado;
@@ -37,7 +37,7 @@ public class OrdenDeInspeccion {
         return fechaHoraCierre;
     }
 
-    public int getNumeroDeOrdenDeInspeccion() {
+    public String getNumeroDeOrdenDeInspeccion() {
         return numeroOrden;
     }
 
@@ -88,11 +88,12 @@ public class OrdenDeInspeccion {
         this.estado = nuevoEstado;
     }
 
-    public void cerrar(LocalDateTime fechaCierre) {
+    public void cerrar(LocalDateTime fechaCierre, Estado nuevoEstado) {
         setFechaHoraCierre(fechaCierre);
+        setEstado(nuevoEstado);
     }
 
-    public void ponerSismografoFueraDeServicio(Sismografo sismografo, List<MotivoFueraServicio> motivos, Empleado responsable) {
-        estacion.ponerSismografoFueraDeServicio(sismografo, motivos, responsable);
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable) {
+        estacion.ponerSismografoFueraDeServicio(sismografos, motivos, responsable);
     }
 }

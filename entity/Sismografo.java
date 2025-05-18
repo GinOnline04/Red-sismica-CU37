@@ -25,11 +25,7 @@ public class Sismografo {
         return identificadorSismografo;
     }
 
-    public void setEstadoActual(CambioEstado estadoActual) {
-        this.estadoActual = estadoActual;
-    }
-
-    public void fueraDeServicio(List<MotivoFueraServicio> motivos, Empleado responsable) {
+    public void fueraDeServicio(List<MotivoTipo> motivos, Empleado responsable) {
         estadoActual.fueraDeServicio(this, motivos, responsable);
     }
 
