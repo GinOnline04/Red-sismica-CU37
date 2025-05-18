@@ -1,4 +1,4 @@
-package flujo1;
+package nehu;
 
 //Sesion.java
 import java.time.LocalDateTime;
@@ -30,6 +30,12 @@ public class Sesion {
  }
 
  public Empleado obtenerRILogueado() {
-     throw new UnsupportedOperationException("Implementar lógica para recuperar el Responsable de Inspecciones logueado");
- }
+	    Empleado empleado = usuario.obtenerEmpleado();
+	    if (empleado.getRol().esResponsableReparacion()) {
+	        return empleado;
+	    } else {
+	        throw new IllegalStateException("El usuario no es Responsable de Inspecciones.");
+	    }
+	}
+ 
 }

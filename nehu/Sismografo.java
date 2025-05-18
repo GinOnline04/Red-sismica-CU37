@@ -1,0 +1,33 @@
+package nehu;
+
+import java.util.Date;
+import java.util.List;
+
+public class Sismografo {
+    private Date fechaAdquisicion;
+    private String identificadorSismografo;
+    private int nroSerie;
+    private CambioEstado estadoActual;
+
+    public Sismografo(Date fechaAdquisicion, String identificadorSismografo, int nroSerie) {
+        this.fechaAdquisicion = fechaAdquisicion;
+        this.identificadorSismografo = identificadorSismografo;
+        this.nroSerie = nroSerie;
+    }
+
+    public String getIdentificadorSismografo() {
+        return identificadorSismografo;
+    }
+
+    public void setEstadoActual(CambioEstado estadoActual) {
+        this.estadoActual = estadoActual;
+    }
+
+    public void fueraDeServicio(List<MotivoFueraServicio> motivos, Empleado responsable) {
+        estadoActual.fueraDeServicio(this, motivos, responsable);
+    }
+
+    public void actualizarEstado(CambioEstado nuevoEstado) {
+        this.estadoActual = nuevoEstado;
+    }
+}

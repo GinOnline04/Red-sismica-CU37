@@ -1,4 +1,4 @@
-package flujo1;
+package nehu;
 
 //Rol.java
 public class Rol {
@@ -19,6 +19,7 @@ public class Rol {
  }
 
  public boolean esResponsableReparacion() {
-     throw new UnsupportedOperationException("Implementar lógica según definición de roles");
- }
+	    return "ResponsableReparacion".equals(this.nombre);
+	}
+
 }

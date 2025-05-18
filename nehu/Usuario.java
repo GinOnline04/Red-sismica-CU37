@@ -1,15 +1,14 @@
-package flujo1;
+package nehu;
 
 //Usuario.java
 public class Usuario {
 	 private String nombreUsuario;
-	 private String contraseña;
-	
+	 private String contraseï¿½a;
 	 private Empleado empleadoAsociado;
 	
-	 public Usuario(String nombreUsuario, String contraseña, Empleado empleadoAsociado) {
+	 public Usuario(String nombreUsuario, String contraseï¿½a, Empleado empleadoAsociado) {
 	     this.nombreUsuario = nombreUsuario;
-	     this.contraseña = contraseña;
+	     this.contraseï¿½a = contraseï¿½a;
 	     this.empleadoAsociado = empleadoAsociado;
 	 }
 	
@@ -17,8 +16,8 @@ public class Usuario {
 	     return nombreUsuario;
 	 }
 	
-	 public boolean verificarContraseña(String intento) {
-	     return contraseña.equals(intento);
+	 public boolean verificarContraseï¿½a(String intento) {
+	     return contraseï¿½a.equals(intento);
 	 }
 	
 	 public Empleado obtenerEmpleado() {

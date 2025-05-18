@@ -1,14 +1,12 @@
-package flujo1;
+package nehu;
 
 
 public class MotivoTipo {
 
     private String descripcion;
-    private String nombreAmbito;
 
-    public MotivoTipo(String descripcion, String nombreAmbito) {
+    public MotivoTipo(String descripcion) {
         this.descripcion = descripcion;
-        this.nombreAmbito = nombreAmbito;
     }
 
     public String getDescripcion() {
