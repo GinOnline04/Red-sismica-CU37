@@ -30,7 +30,7 @@ public class Sesion {
      this.fechaFin = LocalDateTime.now();
  }
 
- public Empleado obtenerRILogueado() {
+ public Empleado obtenerEmpleadoLogueado() {
 	    Empleado empleado = usuario.obtenerEmpleado();
 	    if (empleado.getRol().esResponsableReparacion()) {
 	        return empleado;
