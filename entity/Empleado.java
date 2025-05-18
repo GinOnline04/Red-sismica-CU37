@@ -1,10 +1,11 @@
-package nehu;
+package entity;
 
 public class Empleado {
     private String apellido;
     private String mail;
     private String nombre;
     private String telefono;
+
     private Rol rol;
 
     public Empleado(String nombre, String apellido, String mail, String telefono, Rol rol) {

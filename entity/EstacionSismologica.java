@@ -1,4 +1,4 @@
-package nehu;
+package entity;
 
 import java.util.Date;
 import java.util.List;

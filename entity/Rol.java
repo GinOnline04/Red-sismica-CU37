@@ -1,4 +1,4 @@
-package nehu;
+package entity;
 
 //Rol.java
 public class Rol {

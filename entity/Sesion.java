@@ -1,12 +1,13 @@
-package nehu;
+package entity;
 
 //Sesion.java
 import java.time.LocalDateTime;
 
 public class Sesion {
- private Usuario usuario;
  private LocalDateTime fechaInicio;
  private LocalDateTime fechaFin;
+
+ private Usuario usuario;
 
  public Sesion(Usuario usuario, LocalDateTime fechaInicio) {
      this.usuario = usuario;

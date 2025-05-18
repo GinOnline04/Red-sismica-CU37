@@ -1,14 +1,15 @@
-package nehu;
+package entity;
 
 //Usuario.java
 public class Usuario {
 	 private String nombreUsuario;
-	 private String contrase�a;
+	 private String contrasena;
+
 	 private Empleado empleadoAsociado;
 	
-	 public Usuario(String nombreUsuario, String contrase�a, Empleado empleadoAsociado) {
+	 public Usuario(String nombreUsuario, String contrasena, Empleado empleadoAsociado) {
 	     this.nombreUsuario = nombreUsuario;
-	     this.contrase�a = contrase�a;
+	     this.contrasena = contrasena;
 	     this.empleadoAsociado = empleadoAsociado;
 	 }
 	
@@ -16,8 +17,8 @@ public class Usuario {
 	     return nombreUsuario;
 	 }
 	
-	 public boolean verificarContrase�a(String intento) {
-	     return contrase�a.equals(intento);
+	 public boolean verificarContrasena(String intento) {
+	     return contrasena.equals(intento);
 	 }
 	
 	 public Empleado obtenerEmpleado() {

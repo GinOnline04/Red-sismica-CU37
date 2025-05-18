@@ -1,4 +1,4 @@
-package nehu;
+package entity;
 
 public class Estado {
     private String ambito;
