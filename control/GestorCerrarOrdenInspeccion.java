@@ -302,6 +302,7 @@ public class GestorCerrarOrdenInspeccion {
                 LocalDateTime.of(2024, 10, 1, 8, 0),
                 null,
                 emp1,
+
                 estado1
         );
 
