@@ -98,7 +98,7 @@ public class OrdenDeInspeccion {
         setEstado(nuevoEstado);
     }
 
-    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable) {
-        estacion.ponerSismografoFueraDeServicio(sismografos, motivos, responsable);
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable, List<String> comentarios) {
+        estacion.ponerSismografoFueraDeServicio(sismografos, motivos, responsable, comentarios);
     }
 }

@@ -126,7 +126,7 @@ public class GestorCerrarOrdenInspeccion {
         validarExistenciaObservacion(comentarios);
         validarExistenciaMotivoSeleccionado(motivosTipoSeleccionados);
         cerrarOrdenDeInspeccion(buscarEstadoCerradaOI(estados));
-        ponerSismografoFueraServicio(sismografos,empleadoLogueado);
+        ponerSismografoFueraServicio(sismografos,empleadoLogueado, comentarios);
 
         //GENERAMOS UN MAP CON MOTIVO Y COMENTARIO
         Map<MotivoTipo, String> motivoConComentario = new HashMap<>();
@@ -186,9 +186,9 @@ public class GestorCerrarOrdenInspeccion {
         throw new RuntimeException("No se encontró un estado Fuera de Servicio.");
     }
 
-    public void ponerSismografoFueraServicio(List<Sismografo> sismografos, Empleado responsable) {
+    public void ponerSismografoFueraServicio(List<Sismografo> sismografos, Empleado responsable, List<String> comentarios) {
         if (ordenInspeccionSeleccionada != null) {
-            ordenInspeccionSeleccionada.ponerSismografoFueraDeServicio(sismografos, motivosTipoSeleccionados, responsable);
+            ordenInspeccionSeleccionada.ponerSismografoFueraDeServicio(sismografos, motivosTipoSeleccionados, responsable,comentarios );
         } else {
             throw new RuntimeException("No hay una orden seleccionada.");
         }
@@ -302,7 +302,6 @@ public class GestorCerrarOrdenInspeccion {
                 LocalDateTime.of(2024, 10, 1, 8, 0),
                 null,
                 emp1,
-                null,
                 estado1
         );
 
@@ -310,7 +309,6 @@ public class GestorCerrarOrdenInspeccion {
                 LocalDateTime.of(2024, 10, 5, 9, 30),
                 null,
                 emp2,
-                null,
                 estado2
         );
 
@@ -318,7 +316,6 @@ public class GestorCerrarOrdenInspeccion {
                 LocalDateTime.of(2024, 10, 10, 14, 15),
                 null,
                 emp3,
-                null,
                 estado7
         );
 

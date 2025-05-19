@@ -36,10 +36,10 @@ public class EstacionSismologica {
         return sismografo.getIdentificadorSismografo();
     }
 
-    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable) {
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable, List<String> comentarios) {
         for (Sismografo sismografo : sismografos) {
             if (sismografo.getIdentificadorSismografo().equals(this.getIdentificadorSismografo())) {
-                sismografo.fueraDeServicio(motivos, responsable);
+                sismografo.fueraDeServicio(motivos, responsable, comentarios);
                 return; // Se asume que el identificador es único, por eso se puede salir del loop
             }
         }

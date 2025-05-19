@@ -7,4 +7,15 @@
 /mavenHomeManager.xml
 # Datasource local storage ignored files
 /dataSources/
+
+#Ignorar .idea
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+workspace.xml
+
+# Ignorar out
+
+/out/
+
 /dataSources.local.xml
