@@ -4,6 +4,7 @@ import entity.MotivoTipo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class InterfazMonitorCCRS {
 
@@ -18,7 +19,7 @@ public class InterfazMonitorCCRS {
     public void publicarNotificacion(String idSismografo,
                                       String nombreEstado,
                                       LocalDateTime fechaHoraRegistro,
-                                      List<MotivoTipo> motivosYComentarios) {
+                                      Map<MotivoTipo, String> motivosYComentarios) {
 
         System.out.println("🖥️  Publicación en monitor CCRS:");
         System.out.println("=====================================================");
@@ -27,8 +28,10 @@ public class InterfazMonitorCCRS {
         System.out.println("🕒 Fecha y hora del cambio: " + fechaHoraRegistro);
         System.out.println("📋 Motivos asociados:");
 
-        for (MotivoTipo motivo : motivosYComentarios) {
-            System.out.println("   - " + motivo.getDescripcion());
+        for (Map.Entry<MotivoTipo, String> entry : motivosYComentarios.entrySet()) {
+            String motivo = entry.getKey().getDescripcion();
+            String comentario = entry.getValue();
+            System.out.println("- " + motivo + ": " + comentario);
         }
 
         System.out.println("=====================================================\n");

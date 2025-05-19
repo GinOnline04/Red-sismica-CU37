@@ -1,12 +1,13 @@
 package control;
 
 import boundary.*;
+import com.sun.tools.jconsole.JConsoleContext;
+import com.sun.tools.jconsole.JConsolePlugin;
 import entity.*;
 
+import javax.swing.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class GestorTest {
     // Atributos
@@ -21,7 +22,7 @@ public class GestorTest {
     private String observacionCierreOrdenInspeccion;
     private List<MotivoTipo> motivos;
     private List<MotivoTipo> motivosTipoSeleccionados;
-    private String comentario;
+    private List<String> comentarios;
     private List<Estado> estados;
     private List<Sismografo> sismografos;
     private List<Empleado> empleados;
@@ -33,24 +34,21 @@ public class GestorTest {
         this.interfaz = interfaz;
         this.interfazNotificacionMail = interfazNotificacionMail;
         this.interfazMonitorCCRS = interfazMonitorCCRS;
+        this.motivosTipoSeleccionados = new ArrayList<>();
+        this.comentarios = new ArrayList<>();
     }
 
     // Métodos
 
     public void iniciarCierreOrdenInspeccion() {
+
+        // GUARDAMOS DATOS MOCK
+        generardatos();
+        // ARRANCAMOS EL FLUJO
         this.empleadoLogueado = buscarEmpleadoLogueado();
         this.ordenesCompletamenteRealizadas = buscarOrdenesInspeccionDeRI(empleadoLogueado, todasLasOrdenes);
         ordenarPorFechaFinalizacion(this.ordenesCompletamenteRealizadas);
         interfaz.pedirSeleccionOrdenInspeccion(this.ordenesCompletamenteRealizadas);
-        this.pedirObservacionCierreOrden();
-        this.buscarTiposMotivoFueraDeServicio(motivos);
-        this.pedirSeleccionMotivoTipo(motivos);
-        interfaz.tomarComentario();
-        validarExistenciaObservacion(this.observacionCierreOrdenInspeccion);
-        validarExistenciaMotivoSeleccionado(this.motivosTipoSeleccionados);
-        cerrarOrdenDeInspeccion(buscarEstadoCerradaOI(estados));
-        ponerSismografoFueraServicio(sismografos,empleadoLogueado);
-        notificar(ordenInspeccionSeleccionada.getIdSismografo(), this.buscarFueraDeServicio(), fechaHoraFinalizacion, motivosTipoSeleccionados);
     }
 
     private Empleado buscarEmpleadoLogueado() {
@@ -62,12 +60,13 @@ public class GestorTest {
 
         for (OrdenDeInspeccion orden : todasLasOrdenes) {
             if (orden.sosDeEmpleado(empleado) && orden.sosCompletamenteRealizada()) {
-                ordenesFiltradas.add(orden.obtenerDatosOrdenInspeccion());
+                ordenesFiltradas.add(orden);
             }
         }
 
         return ordenesFiltradas;
     }
+
 
     private void ordenarPorFechaFinalizacion(List<OrdenDeInspeccion> ordenesFiltradas) {
         ordenesFiltradas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaFinalizacion));
@@ -77,6 +76,7 @@ public class GestorTest {
         for (OrdenDeInspeccion orden : ordenesCompletamenteRealizadas) {
             if (orden.getNumeroDeOrdenDeInspeccion().equals(numeroOrden)) {
                 this.ordenInspeccionSeleccionada = orden;
+                pedirObservacionCierreOrden();
                 return;
             }
         }
@@ -84,6 +84,8 @@ public class GestorTest {
 
     public void tomarObservacionCierreOrden(String observacionCierreOrden) {
         this.observacionCierreOrdenInspeccion = observacionCierreOrden;
+        this.buscarTiposMotivoFueraDeServicio(motivos);
+        this.pedirSeleccionMotivoTipo(motivos);
     }
 
     private void pedirObservacionCierreOrden(){
@@ -104,13 +106,15 @@ public class GestorTest {
         for (MotivoTipo motivo : motivosTipoDisponibles) {
             if (motivo.toString().equals(motivoSeleccionado)) {
                 motivosTipoSeleccionados.add(motivo);
+                System.out.println("MOTIVOS SELECCIONADOS:"+ motivosTipoSeleccionados);
                 break;
             }
         }
     }
 
     public void tomarComentario(String comentario){
-        this.comentario = comentario;
+
+        comentarios.add(comentario);
         pedirSeleccionMotivoTipo(motivos);
     }
 
@@ -122,11 +126,25 @@ public class GestorTest {
 
     public void tomarConfirmacionCierreOrden(boolean confirmacion){
         System.out.println("confirmacion recibida y es: " + confirmacion);
+        validarExistenciaObservacion(comentarios);
+        validarExistenciaMotivoSeleccionado(motivosTipoSeleccionados);
+        cerrarOrdenDeInspeccion(buscarEstadoCerradaOI(estados));
+        ponerSismografoFueraServicio(sismografos,empleadoLogueado);
+
+        //GENERAMOS UN MAP CON MOTIVO Y COMENTARIO
+        Map<MotivoTipo, String> motivoConComentario = new HashMap<>();
+
+        for (int i = 0; i < motivosTipoSeleccionados.size(); i++) {
+            MotivoTipo motivo = motivosTipoSeleccionados.get(i);
+            String comentario = i < comentarios.size() ? comentarios.get(i) : "";
+            motivoConComentario.put(motivo, comentario);
+        }
+        notificar(ordenInspeccionSeleccionada.getIdSismografo(), this.buscarFueraDeServicio(), fechaHoraFinalizacion, motivoConComentario);
     }
 
-    public boolean validarExistenciaObservacion(String comentario) {
-        if (comentario == null || comentario.trim().isEmpty()) {
-            System.out.println("La observación es obligatoria.");
+    public boolean validarExistenciaObservacion(List<String> comentariosIngresados) {
+        if (comentariosIngresados == null || comentariosIngresados.isEmpty()) {
+            System.out.println("Debe ingresar Comentarios.");
             return false;
         }
         return true;
@@ -191,7 +209,7 @@ public class GestorTest {
         return mailsResponsables;
     }
 
-    public void notificar(String idSismografo, Estado estado, LocalDateTime fechaHoraRegistro, List<MotivoTipo> motivosYComentarios) {
+    public void notificar(String idSismografo, Estado estado, LocalDateTime fechaHoraRegistro,  Map<MotivoTipo, String> motivosYComentarios) {
 
         // 1. Notificar por mail a los responsables
         List<String> mailsResponsables = buscarResponsablesReparacion();
@@ -201,8 +219,10 @@ public class GestorTest {
                 "Fecha y hora del cambio: " + fechaHoraRegistro + "\n" +
                 "Motivos y comentarios:\n";
 
-        for (MotivoTipo motivo : motivosYComentarios) {
-            cuerpo += "- " + motivo.getDescripcion() + "\n";
+        for (Map.Entry<MotivoTipo, String> entry : motivosYComentarios.entrySet()) {
+            String motivo = entry.getKey().getDescripcion();
+            String comentario = entry.getValue();
+            cuerpo += "- " + motivo + ": " + comentario + "\n";
         }
 
         for (String mail : mailsResponsables) {
@@ -218,47 +238,203 @@ public class GestorTest {
         );
     }
 
-//    public void generarDatos(){
-//        // ====== Crear un empleado logueado ======
-//        Empleado empleadoLogueado = new Empleado("Juan", "Pérez", "juan.perez@sismo.org", "3543-000000");
-//        Usuario usuario = new Usuario("jperez", "1234", empleadoLogueado);
-//
-//        // ====== Sesión actual ======
-//        Sesion sesion = Sesion.getInstancia();
-//        sesion.setUsuarioLogueado(usuario);
-//        gestor.sesionActual = sesion;
-//
-//        // ====== Estado COMPLETAMENTE REALIZADA y CERRADA ======
-//        Estado estadoCompletada = new Estado("Completamente Realizada", true, false, false);
-//        Estado estadoCerrada = new Estado("Cerrada", false, true, false);
-//        Estado estadoFueraServicio = new Estado("Fuera de Servicio", false, false, true);
-//        List<Estado> estados = List.of(estadoCompletada, estadoCerrada, estadoFueraServicio);
-//        gestor.estados = estados;
-//
-//        // ====== Sismógrafo y estación ======
-//        Sismografo s1 = new Sismografo("SISMO001");
-//        EstacionSismologica estacion = new EstacionSismologica("Estación Norte", s1);
-//
-//        // ====== Orden de inspección ======
-//        OrdenDeInspeccion orden = new OrdenDeInspeccion(1001, LocalDateTime.now().minusDays(2), empleadoLogueado, estacion, estadoCompletada);
-//        orden.setFechaHoraCierre(LocalDateTime.now().minusDays(1)); // simula finalización
-//
-//        List<OrdenDeInspeccion> todasLasOrdenes = new ArrayList<>();
-//        todasLasOrdenes.add(orden);
-//        gestor.todasLasOrdenes = todasLasOrdenes;
-//
-//        // ====== Motivos tipo ======
-//        MotivoTipo motivo1 = new MotivoTipo("Sensor dañado");
-//        MotivoTipo motivo2 = new MotivoTipo("Interferencia eléctrica");
-//        gestor.motivos = List.of(motivo1, motivo2);
-//        gestor.motivosTipoSeleccionados = new ArrayList<>();
-//
-//        // ====== Lista de sismógrafos (para buscar por ID) ======
-//        gestor.sismografos = List.of(s1);
-//
-//        // ====== Lista de empleados (para notificación) ======
-//        Empleado responsableReparacion = new Empleado("Marta", "López", "marta.lopez@sismo.org", "3543-111111");
-//        responsableReparacion.setEsResponsableReparacion(true);
-//        gestor.empleados = List.of(empleadoLogueado, responsableReparacion);
-//    }
+    public void generardatos() {
+        // ---------
+        // LISTADO MOTIVOS TIPO
+        // ---------
+        motivos = new ArrayList<>();
+        motivos.add(MotivoTipo.AVERIA_VIBRACION);
+        motivos.add(MotivoTipo.DESGASTE_COMPONENTE);
+        motivos.add(MotivoTipo.FALLO_REGISTRO);
+        motivos.add(MotivoTipo.VANDALISMO);
+        motivos.add(MotivoTipo.FALLO_ALIMENTACION);
+        motivos.add(MotivoTipo.OTRO); // Por si querés dejar un motivo genérico
+
+
+        // ---------
+        // ROLES
+        // ---------
+        Rol responsableReparacion = new Rol("ResponsableReparacion", "Encargado de coordinar y realizar reparaciones del sismógrafo.");
+        Rol tecnico = new Rol("Tecnico", "Encargado de tareas técnicas generales.");
+        Rol supervisor = new Rol("Supervisor", "Supervisa las tareas de inspección y mantenimiento.");
+        Rol administrador = new Rol("Administrador", "Gestiona usuarios y configuraciones del sistema.");
+
+        // ---------
+        // EMPLEADOS
+        // ---------
+        Empleado emp1 = new Empleado("Lucía", "Gómez", "lucia.gomez@sismo.gob.ar", "3511234567", responsableReparacion);
+        Empleado emp2 = new Empleado("Martín", "Fernández", "martin.fernandez@sismo.gob.ar", "3512345678", responsableReparacion);
+        Empleado emp3 = new Empleado("Sofía", "López", "sofia.lopez@sismo.gob.ar", "3513456789", responsableReparacion);
+        Empleado emp4 = new Empleado("Carlos", "Ramírez", "carlos.ramirez@sismo.gob.ar", "3514567890", supervisor);
+        Empleado emp5 = new Empleado("Ana", "Torres", "ana.torres@sismo.gob.ar", "3515678901", administrador);
+
+        // Listado empleados
+        empleados = new ArrayList<>();
+        empleados.add(emp1);
+        empleados.add(emp2);
+        empleados.add(emp3);
+        empleados.add(emp4);
+        empleados.add(emp5);
+
+        // ---------
+        // USUARIOS
+        // ---------
+        Usuario usuario1 = new Usuario("lucia.g", "pass123", emp1);
+        Usuario usuario2 = new Usuario("martin.f", "mantenimiento123", emp3);
+
+        // ---------
+        // SESION
+        // ---------
+
+        //CASO DE QUE TIENE 2  ORDENES
+        this.sesionActual = new Sesion(usuario1, LocalDateTime.now());
+
+        // FLUJO ALTERNATIVO --> NO TIENE OI REALIZADAS
+        //this.sesionActual = new Sesion(usuario2, LocalDateTime.now());
+
+        // ---------
+        // CAMBIOS ESTADO y ESTADOS
+        // ---------
+
+        Estado estado1 = new Estado("OrdenInspeccion", "Completamente Realizada");
+        Estado estado2 = new Estado("Sismografo", "Cerrada");
+        Estado estado3 = new Estado("OrdenInspeccion", "Fuera de Servicio");
+        Estado estado7 = new Estado("Sismografo", "Completamente Realizada");
+
+        CambioEstado cambio1 = new CambioEstado(
+                LocalDateTime.of(2024, 10, 1, 8, 0),
+                null,
+                emp1,
+                null,
+                estado1
+        );
+
+        CambioEstado cambio2 = new CambioEstado(
+                LocalDateTime.of(2024, 10, 5, 9, 30),
+                null,
+                emp2,
+                null,
+                estado2
+        );
+
+        CambioEstado cambio3 = new CambioEstado(
+                LocalDateTime.of(2024, 10, 10, 14, 15),
+                null,
+                emp3,
+                null,
+                estado7
+        );
+
+        // LISTADO DE ESTADOS
+        estados = new ArrayList<>();
+        estados.add(estado1);
+        estados.add(estado2);
+        estados.add(estado3);
+        estados.add(estado7);
+
+        // ---------
+        // ESTACIONES
+        // ---------
+
+        EstacionSismologica estacion1 = new EstacionSismologica(
+                101,
+                "Cert-2023-0001",
+                new Date(123, 4, 10),  // Año 2023, mayo 10 (recuerda que el mes es 0-based)
+                -34.6037,
+                -58.3816,
+                "Estacion Centro",
+                5001,
+                null // Sismografo no asignado para evitar ciclo
+        );
+
+        EstacionSismologica estacion2 = new EstacionSismologica(
+                102,
+                "Cert-2023-0002",
+                new Date(124, 0, 20),  // Año 2024, enero 20
+                -33.4489,
+                -70.6693,
+                "Estacion Norte",
+                5002,
+                null
+        );
+
+        // ---------
+        // SISMOGRAFO
+        // ---------
+
+        Sismografo sismografo1 = new Sismografo(
+                new Date(120, 5, 15),  // 15 junio 2020
+                "SIS-001",
+                1001,
+                estacion1,
+                cambio3,
+                estado7
+        );
+
+        Sismografo sismografo2 = new Sismografo(
+                new Date(121, 8, 10),  // 10 septiembre 2021
+                "SIS-002",
+                1002,
+                estacion1,
+                cambio3,
+                estado7
+        );
+
+        Sismografo sismografo3 = new Sismografo(
+                new Date(122, 0, 25),  // 25 enero 2022
+                "SIS-003",
+                1003,
+                estacion2,
+                cambio2,
+                estado2
+        );
+
+        // LISTADO DE SISMOGRAFOS
+        sismografos = new ArrayList<>();
+        sismografos.add(sismografo1);
+        sismografos.add(sismografo2);
+        sismografos.add(sismografo3);
+
+        // SETEAMOS LOS SISMOGRAFOS A LAS ESTACIONES
+        estacion1.setSismografo(sismografo1);
+        estacion2.setSismografo(sismografo2);
+
+        // ---------
+        // ORDENES DE INSPECCION
+        // ---------
+
+        OrdenDeInspeccion orden1 = new OrdenDeInspeccion(
+                "ORD-0001",
+                LocalDateTime.of(2025, 1, 10, 9, 30),
+                LocalDateTime.of(2025,5, 12, 16, 0),
+
+                emp2,
+                estacion1,
+                estado1
+        );
+
+        OrdenDeInspeccion orden2 = new OrdenDeInspeccion(
+                "ORD-0002",
+                LocalDateTime.of(2025, 2, 11, 14, 0),
+                LocalDateTime.of(2025,4, 11, 14, 0),
+                emp1,
+                estacion1,
+                estado1
+        );
+        OrdenDeInspeccion orden3 = new OrdenDeInspeccion(
+                "ORD-0003",
+                LocalDateTime.of(2025, 4, 11, 14, 0),
+                LocalDateTime.of(2025,5, 11, 14, 0),
+                emp1,
+                estacion2,
+                estado1
+        );
+
+        //listado de ordenes
+        todasLasOrdenes = new ArrayList<>();
+        todasLasOrdenes.add(orden1);
+        todasLasOrdenes.add(orden2);
+        todasLasOrdenes.add(orden3);
+
+    }
 }

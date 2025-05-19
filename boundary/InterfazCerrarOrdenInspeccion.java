@@ -1,11 +1,16 @@
 package boundary;
 
+import com.sun.tools.jconsole.JConsoleContext;
+import com.sun.tools.jconsole.JConsolePlugin;
 import control.GestorTest;
 import entity.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.constant.DynamicCallSiteDesc;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InterfazCerrarOrdenInspeccion extends JFrame {
     private JPanel panelPrincipal;
@@ -19,7 +24,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         this.setSize(800, 600);
         this.setLocationRelativeTo(null); // Centrar la ventana
 
-        panelPrincipal = new JPanel();
+        panelPrincipal = new JPanel(new BorderLayout());
         panelPrincipal.setLayout(new BorderLayout());
 
         JButton botonCerrarOrden = new JButton("Cerrar Orden de Inspección");
@@ -41,6 +46,8 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.removeAll(); //Limpia pantalla
         JLabel titulo = new JLabel("Esperando Ordenes de Inspección...", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 16));
+        interfazNotificacionMail = new InterfazNotificacionMail();
+        interfazMonitorCCRS = new InterfazMonitorCCRS();
         panelPrincipal.add(titulo, BorderLayout.CENTER);
         panelPrincipal.revalidate();
         panelPrincipal.repaint();
@@ -51,12 +58,24 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
     public void pedirSeleccionOrdenInspeccion(List<OrdenDeInspeccion> ordenesCompletamenteRealizadas) {
         panelPrincipal.removeAll();
 
+        if (ordenesCompletamenteRealizadas == null || ordenesCompletamenteRealizadas.isEmpty()) {
+            JLabel mensaje = new JLabel("No tiene órdenes de inspección completamente realizadas.", SwingConstants.CENTER);
+            panelPrincipal.add(mensaje, BorderLayout.CENTER);
+            panelPrincipal.revalidate();
+            panelPrincipal.repaint();
+            return;
+        }
+
         JLabel titulo = new JLabel("Seleccionar Orden:", SwingConstants.CENTER);
         panelPrincipal.add(titulo, BorderLayout.NORTH);
 
         DefaultListModel<String> model = new DefaultListModel<>();
+        Map<String, OrdenDeInspeccion> mapaOrdenes = new HashMap<>();
+
         for (OrdenDeInspeccion orden : ordenesCompletamenteRealizadas) {
-            model.addElement(String.valueOf(orden));
+            String datos = orden.obtenerDatosOrdenInspeccion();
+            model.addElement(datos);
+            mapaOrdenes.put(datos, orden);
         }
 
         JList<String> listaOrdenes = new JList<>(model);
@@ -67,7 +86,9 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         btnSeleccionar.addActionListener(e -> {
             String seleccionada = listaOrdenes.getSelectedValue();
             if (seleccionada != null) {
-                tomarOrdenInspeccionSeleccionada(seleccionada);
+                OrdenDeInspeccion ordenSeleccionada = mapaOrdenes.get(seleccionada);
+                tomarOrdenInspeccionSeleccionada(ordenSeleccionada.getNumeroDeOrdenDeInspeccion());
+                System.out.println("SELECCION: " + seleccionada);
             }
         });
 
@@ -79,9 +100,9 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.repaint();
     }
 
+
     public void tomarOrdenInspeccionSeleccionada(String numeroOrden) {
         gestor.tomarOrdenInspeccionSeleccionada(numeroOrden);
-        pedirObservacionCierreOrden();
     }
 
     public void pedirObservacionCierreOrden() {
@@ -114,6 +135,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
     }
 
     public void tomarObservacionCierreOrden(String texto){
+        System.out.println("OBSERVACION: "+texto);
         gestor.tomarObservacionCierreOrden(texto.trim());
     }
 
@@ -137,6 +159,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         btnSeleccionar.addActionListener(e -> {
             String motivoSeleccionado = listaMotivos.getSelectedValue();
             if (motivoSeleccionado != null) {
+                System.out.println("MOTIVO: "+motivoSeleccionado);
                 tomarMotivoTipo(motivoSeleccionado, motivosTipo);
             } else {
                 JOptionPane.showMessageDialog(this, "Debe seleccionar un motivo.");
@@ -178,8 +201,6 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
                 JOptionPane.showMessageDialog(this, "El comentario no puede estar vacío.");
             } else {
                 gestor.tomarComentario(comentario);
-                // volvemos a mostrar la lista de motivos para seguir el ciclo
-                //gestor.pedirSeleccionMotivoTipo(motivos);
             }
         });
 

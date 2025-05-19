@@ -15,9 +15,10 @@ public class OrdenDeInspeccion {
     private EstacionSismologica estacion;
     private Estado estado;
 
-    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, Empleado empleado, EstacionSismologica estacion, Estado estado) {
+    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFinalizacion, Empleado empleado, EstacionSismologica estacion, Estado estado) {
         this.numeroOrden = numeroOrden;
         this.fechaHoraInicio = fechaHoraInicio;
+        this.fechaHoraFinalizacion = fechaHoraFinalizacion;
         this.empleado = empleado;
         this.estacion = estacion;
         this.estado = estado;
@@ -68,9 +69,13 @@ public class OrdenDeInspeccion {
         return estado != null && estado.sosCompletamenteRealizada();
     }
 
-    public OrdenDeInspeccion obtenerDatosOrdenInspeccion() {
-        return this;
+    public String obtenerDatosOrdenInspeccion() {
+        return "Orden Nº " + numeroOrden
+                + " | Finalizada: " + (fechaHoraFinalizacion != null ? fechaHoraFinalizacion.toString() : "Sin finalizar")
+                + " | Estación: " + estacion.getNombreEstacion()
+                + " | Sismógrafo: " + estacion.getIdentificadorSismografo();
     }
+
 
     public String getIdSismografo() {
         return estacion.getIdentificadorSismografo();

@@ -46,4 +46,8 @@ public class EstacionSismologica {
 
         System.out.println("No se encontró un sismógrafo con el identificador: " + this.getIdentificadorSismografo());
     }
+
+    public void setSismografo(Sismografo sismografo) {
+        this.sismografo = sismografo;
+    }
 }

@@ -1,11 +1,12 @@
 package entity;
 
 public enum MotivoTipo {
-    FALLO_TECNICO("Fallo técnico"),
-    MANTENIMIENTO("Mantenimiento preventivo"),
-    FIRMWARE("Actualización de firmware"),
-    CONECTIVIDAD("Problemas de conectividad"),
-    RUTINA("Inspección de rutina");
+    AVERIA_VIBRACION("Avería por vibración"),
+    DESGASTE_COMPONENTE("Desgaste de componente"),
+    FALLO_REGISTRO("Fallo en el sistema de registro"),
+    VANDALISMO("Vandalismo"),
+    FALLO_ALIMENTACION("Fallo en fuente de alimentación"),
+    OTRO("Otro motivo");
 
     private final String descripcion;
 
