@@ -2,7 +2,7 @@ package boundary;
 
 import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsolePlugin;
-import control.GestorTest;
+import control.GestorCerrarOrdenInspeccion;
 import entity.*;
 
 import javax.swing.*;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class InterfazCerrarOrdenInspeccion extends JFrame {
     private JPanel panelPrincipal;
-    private GestorTest gestor;
+    private GestorCerrarOrdenInspeccion gestor;
     private InterfazNotificacionMail interfazNotificacionMail;
     private InterfazMonitorCCRS interfazMonitorCCRS;
 
@@ -51,7 +51,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.add(titulo, BorderLayout.CENTER);
         panelPrincipal.revalidate();
         panelPrincipal.repaint();
-        gestor = new GestorTest(this, interfazNotificacionMail, interfazMonitorCCRS);
+        gestor = new GestorCerrarOrdenInspeccion(this, interfazNotificacionMail, interfazMonitorCCRS);
         gestor.iniciarCierreOrdenInspeccion();
     }
 
