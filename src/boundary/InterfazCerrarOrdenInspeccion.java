@@ -61,10 +61,12 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         gestor.iniciarCierreOrdenInspeccion();
     }
 
-    public void pedirSeleccionOrdenInspeccion(List<OrdenDeInspeccion> ordenesCompletamenteRealizadas) {
+    public void pedirSeleccionOrdenInspeccion(Map<String, OrdenDeInspeccion> mapaOrdenes) {
         panelPrincipal.removeAll();
 
-        if (ordenesCompletamenteRealizadas == null || ordenesCompletamenteRealizadas.isEmpty()) {
+
+
+        if (mapaOrdenes == null || mapaOrdenes.isEmpty()) {
             JLabel mensaje = new JLabel("No tiene órdenes de inspección completamente realizadas.", SwingConstants.CENTER);
             panelPrincipal.add(mensaje, BorderLayout.CENTER);
             panelPrincipal.revalidate();
@@ -76,12 +78,9 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.add(titulo, BorderLayout.NORTH);
 
         DefaultListModel<String> model = new DefaultListModel<>();
-        Map<String, OrdenDeInspeccion> mapaOrdenes = new HashMap<>();
 
-        for (OrdenDeInspeccion orden : ordenesCompletamenteRealizadas) {
-            String datos = orden.obtenerDatosOrdenInspeccion();
+        for (String datos : mapaOrdenes.keySet()) {
             model.addElement(datos);
-            mapaOrdenes.put(datos, orden);
         }
 
         JList<String> listaOrdenes = new JList<>(model);
@@ -93,7 +92,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
             String seleccionada = listaOrdenes.getSelectedValue();
             if (seleccionada != null) {
                 OrdenDeInspeccion ordenSeleccionada = mapaOrdenes.get(seleccionada);
-                tomarOrdenInspeccionSeleccionada(ordenSeleccionada.getNumeroDeOrdenDeInspeccion());
+                tomarOrdenInspeccionSeleccionada(ordenSeleccionada);
                 System.out.println("SELECCION: " + seleccionada);
             }
         });
@@ -107,8 +106,8 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
     }
 
 
-    public void tomarOrdenInspeccionSeleccionada(String numeroOrden) {
-        gestor.tomarOrdenInspeccionSeleccionada(numeroOrden);
+    public void tomarOrdenInspeccionSeleccionada(OrdenDeInspeccion orden) {
+        gestor.tomarOrdenInspeccionSeleccionada(orden);
     }
 
     public void pedirObservacionCierreOrden() {

@@ -43,7 +43,14 @@ public class GestorCerrarOrdenInspeccion {
         this.empleadoLogueado = buscarEmpleadoLogueado();
         this.ordenesCompletamenteRealizadas = buscarOrdenesInspeccionDeRI(empleadoLogueado, todasLasOrdenes);
         ordenarPorFechaFinalizacion(this.ordenesCompletamenteRealizadas);
-        interfaz.pedirSeleccionOrdenInspeccion(this.ordenesCompletamenteRealizadas);
+        Map<String, OrdenDeInspeccion> mapaOrdenes = new HashMap<>();
+
+        for (OrdenDeInspeccion orden : ordenesCompletamenteRealizadas) {
+            String datos = orden.obtenerDatosOrdenInspeccion();
+            mapaOrdenes.put(datos, orden);
+        }
+
+        interfaz.pedirSeleccionOrdenInspeccion(mapaOrdenes);
     }
 
     private Empleado buscarEmpleadoLogueado() {
@@ -67,14 +74,10 @@ public class GestorCerrarOrdenInspeccion {
         ordenesFiltradas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaFinalizacion));
     }
 
-    public void tomarOrdenInspeccionSeleccionada(String numeroOrden) {
-        for (OrdenDeInspeccion orden : ordenesCompletamenteRealizadas) {
-            if (orden.getNumeroDeOrdenDeInspeccion().equals(numeroOrden)) {
-                this.ordenInspeccionSeleccionada = orden;
-                pedirObservacionCierreOrden();
-                return;
-            }
-        }
+    public void tomarOrdenInspeccionSeleccionada(OrdenDeInspeccion orden) {
+        this.ordenInspeccionSeleccionada = orden;
+        pedirObservacionCierreOrden();
+
     }
 
     public void tomarObservacionCierreOrden(String observacionCierreOrden) {
@@ -309,7 +312,7 @@ public class GestorCerrarOrdenInspeccion {
         this.sesionActual = new Sesion(usuario1, LocalDateTime.now());
 
         // FLUJO ALTERNATIVO --> NO TIENE OI REALIZADAS
-        //this.sesionActual = new Sesion(usuario2, LocalDateTime.now());
+        // this.sesionActual = new Sesion(usuario2, LocalDateTime.now());
 
         // ---------
         // CAMBIOS ESTADO y ESTADOS
