@@ -8,11 +8,11 @@ import java.util.List;
 @Entity
 @Table(name = "cambios_estado")
 public class CambioEstado {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String nombreEstado;
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
@@ -20,11 +20,11 @@ public class CambioEstado {
     @ManyToOne
     @JoinColumn(name = "responsable_id")
     private Empleado responsable;
-    
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "cambio_estado_id")
     private List<MotivoFueraServicio> motivos;
-    
+
     @ManyToOne
     @JoinColumn(name = "estado_id", nullable = false)
     private Estado estado;
@@ -35,7 +35,7 @@ public class CambioEstado {
     }
 
     public CambioEstado(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin,
-                        Empleado responsable, Estado estado) {
+            Empleado responsable, Estado estado) {
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFin = fechaHoraFin;
         this.responsable = responsable;
@@ -64,7 +64,7 @@ public class CambioEstado {
         MotivoFueraServicio nuevoMotivo = new MotivoFueraServicio(comentario, motivo);
         motivos.add(nuevoMotivo);
     }
-    
+
     public void setMotivos(List<MotivoTipo> motivos, List<String> comentarios) {
         if (motivos == null || comentarios == null) {
             throw new IllegalArgumentException("Las listas no pueden ser nulas.");

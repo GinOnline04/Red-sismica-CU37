@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence 
-             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
-             version="3.0">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence 
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" version="3.0">
 
     <persistence-unit name="red-sismica-pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
@@ -19,6 +17,11 @@
         <class>entity.Rol</class>
         <class>entity.MotivoFueraServicio</class>
         <class>entity.Sesion</class>
+        <class>entity.EstadoOrdenInspeccion</class>
+        <class>entity.CompletamenteRealizada</class>
+        <class>entity.Cerrada</class>
+        <class>entity.PendienteDeRealizacion</class>
+        <class>entity.ParcialmenteRealizada</class>
 
         <properties>
             <!-- H2 Database Configuration - Persistente en archivo -->
@@ -32,11 +35,10 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-            
+
             <!-- Naming Strategy: usar snake_case en la base de datos -->
-            <property name="hibernate.physical_naming_strategy" 
-                      value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
-            
+            <property name="hibernate.physical_naming_strategy" value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+
             <!-- SQL script para datos iniciales -->
             <!-- <property name="jakarta.persistence.sql-load-script-source" value="data.sql"/> -->
         </properties>

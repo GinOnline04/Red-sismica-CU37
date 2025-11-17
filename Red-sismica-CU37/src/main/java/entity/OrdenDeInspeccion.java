@@ -7,7 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "ordenes_inspeccion")
 public class OrdenDeInspeccion {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,38 +15,38 @@ public class OrdenDeInspeccion {
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFinalizacion;
     private LocalDateTime fechaHoraCierre;
-    
+
     @Column(nullable = false, unique = true)
     private String numeroOrden;
-    
+
     @Column(length = 2000)
     private String observacionCliente;
 
     @ManyToOne
     @JoinColumn(name = "empleado_id", nullable = false)
     private Empleado empleado;
-    
+
     @ManyToOne
     @JoinColumn(name = "estacion_id", nullable = false)
     private EstacionSismologica estacion;
-    
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "estado_id", nullable = false)
-    private Estado estado;
+    private EstadoOrdenInspeccion estadoOrdenInspeccion;
 
     // Constructor sin argumentos para JPA
     public OrdenDeInspeccion() {
     }
 
-    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, 
-                             LocalDateTime fechaHoraFinalizacion, Empleado empleado, 
-                             EstacionSismologica estacion, Estado estado) {
+    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio,
+            LocalDateTime fechaHoraFinalizacion, Empleado empleado,
+            EstacionSismologica estacion, EstadoOrdenInspeccion estadoOrdenInspeccion) {
         this.numeroOrden = numeroOrden;
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
         this.empleado = empleado;
         this.estacion = estacion;
-        this.estado = estado;
+        this.estadoOrdenInspeccion = estadoOrdenInspeccion;
     }
 
     // === Getters ===
@@ -83,28 +83,29 @@ public class OrdenDeInspeccion {
         return estacion;
     }
 
-    public Estado getEstado() {
-        return estado;
+    public EstadoOrdenInspeccion getEstado() {
+        return estadoOrdenInspeccion;
     }
 
     // === Métodos de negocio ===
 
     public boolean sosDeEmpleado(Empleado empleado) {
-        if (empleado == null) return false;
-        return empleado.equals(this.empleado);
+        if (empleado == null || this.empleado == null)
+            return false;
+        return empleado.getId() != null && empleado.getId().equals(this.empleado.getId());
     }
 
     public boolean sosCompletamenteRealizada() {
-        return estado != null && estado.sosCompletamenteRealizada();
+        return estadoOrdenInspeccion != null && estadoOrdenInspeccion.sosCompletamenteRealizada();
     }
 
     public String obtenerDatosOrdenInspeccion() {
         return "Orden Nº " + numeroOrden
-                + " | Finalizada: " + (fechaHoraFinalizacion != null ? fechaHoraFinalizacion.toString() : "Sin finalizar")
+                + " | Finalizada: "
+                + (fechaHoraFinalizacion != null ? fechaHoraFinalizacion.toString() : "Sin finalizar")
                 + " | Estación: " + estacion.getNombreEstacion()
                 + " | Sismógrafo: " + estacion.getIdentificadorSismografo();
     }
-
 
     public String getIdSismografo() {
         return estacion.getIdentificadorSismografo();
@@ -118,17 +119,22 @@ public class OrdenDeInspeccion {
         this.fechaHoraCierre = fechaHoraCierre;
     }
 
-    public void setEstado(Estado nuevoEstado) {
-        this.estado = nuevoEstado;
+    public void setEstado(EstadoOrdenInspeccion nuevoEstado) {
+        this.estadoOrdenInspeccion = nuevoEstado;
     }
 
-    public void cerrar(LocalDateTime fechaCierre, Estado nuevoEstado) {
-        setFechaHoraCierre(fechaCierre);
-        setEstado(nuevoEstado);
+    public void cerrar(LocalDateTime fechaHoraCierre) {
+        estadoOrdenInspeccion.cerrar(fechaHoraCierre, this);
     }
 
-    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, 
-                                                Empleado responsable, List<String> comentarios) {
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos,
+            Empleado responsable, List<String> comentarios) {
         estacion.ponerSismografoFueraDeServicio(sismografos, motivos, responsable, comentarios);
+    }
+
+    // finalizar()
+    public void finalizar(LocalDateTime fechaFinalizacion, EstadoOrdenInspeccion nuevoEstado) {
+        this.fechaHoraFinalizacion = fechaFinalizacion;
+        setEstado(nuevoEstado);
     }
 }

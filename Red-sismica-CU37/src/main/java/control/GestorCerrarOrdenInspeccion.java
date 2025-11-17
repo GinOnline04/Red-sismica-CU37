@@ -21,7 +21,7 @@ public class GestorCerrarOrdenInspeccion {
     private List<MotivoTipo> motivosTipoSeleccionados;
     private List<String> comentarios;
     private LocalDateTime fechaHoraFinalizacion;
-    
+
     // Repositories
     private OrdenInspeccionRepository ordenInspeccionRepo;
     private EmpleadoRepository empleadoRepo;
@@ -30,16 +30,16 @@ public class GestorCerrarOrdenInspeccion {
     private UsuarioRepository usuarioRepo;
 
     public GestorCerrarOrdenInspeccion(InterfazCerrarOrdenInspeccion interfaz,
-                                       InterfazNotificacionMail interfazNotificacionMail,
-                                       InterfazMonitorCCRS interfazMonitorCCRS,
-                                       Sesion sesionActual) {
+            InterfazNotificacionMail interfazNotificacionMail,
+            InterfazMonitorCCRS interfazMonitorCCRS,
+            Sesion sesionActual) {
         this.interfaz = interfaz;
         this.interfazNotificacionMail = interfazNotificacionMail;
         this.interfazMonitorCCRS = interfazMonitorCCRS;
         this.sesionActual = sesionActual;
         this.motivosTipoSeleccionados = new ArrayList<>();
         this.comentarios = new ArrayList<>();
-        
+
         // Inicializar repositories
         this.ordenInspeccionRepo = new OrdenInspeccionRepository();
         this.empleadoRepo = new EmpleadoRepository();
@@ -51,18 +51,24 @@ public class GestorCerrarOrdenInspeccion {
     // Métodos
 
     public void iniciarCierreOrdenInspeccion() {
+        // Limpiar listas de selecciones anteriores
+        this.motivosTipoSeleccionados.clear();
+        this.comentarios.clear();
+        this.ordenInspeccionSeleccionada = null;
+        this.observacionCierreOrdenInspeccion = null;
+        
         // Inicializar lista de motivos tipo enum
         this.motivos = Arrays.asList(MotivoTipo.values());
-        
+
         // Obtener empleado logueado desde la sesión
         this.empleadoLogueado = buscarEmpleadoLogueado();
-        
+
         // Buscar órdenes completamente realizadas del empleado desde BD
         this.ordenesCompletamenteRealizadas = buscarOrdenesInspeccionDeRI(empleadoLogueado);
-        
+
         // Ordenar por fecha de finalización
         ordenarPorFechaFinalizacion(this.ordenesCompletamenteRealizadas);
-        
+
         // Mostrar órdenes en la interfaz
         interfaz.pedirSeleccionOrdenInspeccion(this.ordenesCompletamenteRealizadas);
     }
@@ -72,10 +78,30 @@ public class GestorCerrarOrdenInspeccion {
     }
 
     private List<OrdenDeInspeccion> buscarOrdenesInspeccionDeRI(Empleado empleado) {
-        // Usar repository para obtener órdenes completamente realizadas del empleado
-        return ordenInspeccionRepo.findByEmpleadoAndCompletamenteRealizada(empleado);
-    }
+        // Obtener TODAS las órdenes desde BD
+        List<OrdenDeInspeccion> todasLasOrdenes = ordenInspeccionRepo.findAll();
+        List<OrdenDeInspeccion> ordenesFiltradas = new ArrayList<>();
 
+        // Recorrer cada orden y aplicar los filtros
+        for (OrdenDeInspeccion orden : todasLasOrdenes) {
+            // 1. Verificar que la orden pertenezca al empleado
+            if (orden.sosDeEmpleado(empleado)) {
+                // 2. Verificar que esté completamente realizada
+                if (orden.sosCompletamenteRealizada()) {
+                    // 3. Obtener datos para mostrar (ya están en la orden)
+                    // - orden.getNumeroDeOrdenDeInspeccion()
+                    // - orden.getFechaFinalizacion()
+                    // - orden.getNombreEstacionSismologica()
+                    // - orden.getIdSismografo()
+                    
+                    // 4. Agregar a la lista de órdenes filtradas
+                    ordenesFiltradas.add(orden);
+                }
+            }
+        }
+
+        return ordenesFiltradas;
+    }
 
     private void ordenarPorFechaFinalizacion(List<OrdenDeInspeccion> ordenesFiltradas) {
         ordenesFiltradas.sort(Comparator.comparing(OrdenDeInspeccion::getFechaFinalizacion));
@@ -97,8 +123,8 @@ public class GestorCerrarOrdenInspeccion {
         this.pedirSeleccionMotivoTipo(motivos);
     }
 
-    private void pedirObservacionCierreOrden(){
-       interfaz.pedirObservacionCierreOrden();
+    private void pedirObservacionCierreOrden() {
+        interfaz.pedirObservacionCierreOrden();
     }
 
     public List<String> buscarTiposMotivoFueraDeServicio(List<MotivoTipo> motivos) {
@@ -108,20 +134,20 @@ public class GestorCerrarOrdenInspeccion {
     }
 
     private void pedirSeleccionMotivoTipo(List<MotivoTipo> motivos) {
-        interfaz.pedirSeleccionMotivoTipo(motivos);
+        interfaz.pedirSeleccionMotivoTipoYComentario(motivos);
     }
 
     public void tomarMotivoTipo(String motivoSeleccionado, List<MotivoTipo> motivosTipoDisponibles) {
         for (MotivoTipo motivo : motivosTipoDisponibles) {
             if (motivo.toString().equals(motivoSeleccionado)) {
                 motivosTipoSeleccionados.add(motivo);
-                System.out.println("MOTIVOS SELECCIONADOS:"+ motivosTipoSeleccionados);
+                System.out.println("MOTIVOS SELECCIONADOS:" + motivosTipoSeleccionados);
                 break;
             }
         }
     }
 
-    public void tomarComentario(String comentario){
+    public void tomarComentario(String comentario) {
 
         comentarios.add(comentario);
         pedirSeleccionMotivoTipo(motivos);
@@ -133,14 +159,14 @@ public class GestorCerrarOrdenInspeccion {
         interfaz.pedirConfirmacionCierreOrden();
     }
 
-    public void tomarConfirmacionCierreOrden(boolean confirmacion){
+    public void tomarConfirmacionCierreOrden(boolean confirmacion) {
         System.out.println("confirmacion recibida y es: " + confirmacion);
         validarExistenciaObservacion(comentarios);
         validarExistenciaMotivoSeleccionado(motivosTipoSeleccionados);
-        cerrarOrdenDeInspeccion(buscarEstadoCerradaOI());
+        cerrarOrdenDeInspeccion();
         ponerSismografoFueraDeServicio(empleadoLogueado, comentarios);
 
-        //GENERAMOS UN MAP CON MOTIVO Y COMENTARIO
+        // GENERAMOS UN MAP CON MOTIVO Y COMENTARIO
         Map<MotivoTipo, String> motivoConComentario = new HashMap<>();
 
         for (int i = 0; i < motivosTipoSeleccionados.size(); i++) {
@@ -148,7 +174,8 @@ public class GestorCerrarOrdenInspeccion {
             String comentario = i < comentarios.size() ? comentarios.get(i) : "";
             motivoConComentario.put(motivo, comentario);
         }
-        notificar(ordenInspeccionSeleccionada.getIdSismografo(), this.buscarFueraDeServicio(), fechaHoraFinalizacion, motivoConComentario);
+        notificar(ordenInspeccionSeleccionada.getIdSismografo(), this.buscarFueraDeServicio(), fechaHoraFinalizacion,
+                motivoConComentario);
     }
 
     public boolean validarExistenciaObservacion(List<String> comentariosIngresados) {
@@ -171,21 +198,15 @@ public class GestorCerrarOrdenInspeccion {
         return LocalDateTime.now();
     }
 
-    public void cerrarOrdenDeInspeccion(Estado nuevoEstado) {
+    public void cerrarOrdenDeInspeccion() {
         if (ordenInspeccionSeleccionada != null) {
             this.fechaHoraFinalizacion = getFechaHoraActual();
-            ordenInspeccionSeleccionada.cerrar(fechaHoraFinalizacion, nuevoEstado);
+            ordenInspeccionSeleccionada.cerrar(fechaHoraFinalizacion);
             // Persistir cambios en BD
             ordenInspeccionRepo.save(ordenInspeccionSeleccionada);
         } else {
             System.out.println("No hay una orden de inspección seleccionada para cerrar.");
         }
-    }
-
-    public Estado buscarEstadoCerradaOI() {
-        // Buscar desde BD el estado "Cerrada" del ámbito "OrdenInspeccion"
-        return estadoRepo.findByAmbitoAndNombre("OrdenInspeccion", "Cerrada")
-                .orElseThrow(() -> new RuntimeException("No se encontró el estado Cerrada para Orden de Inspección"));
     }
 
     public Estado buscarFueraDeServicio() {
@@ -198,8 +219,9 @@ public class GestorCerrarOrdenInspeccion {
         if (ordenInspeccionSeleccionada != null) {
             // Obtener todos los sismógrafos desde BD
             List<Sismografo> sismografos = sismografoRepo.findAll();
-            ordenInspeccionSeleccionada.ponerSismografoFueraDeServicio(sismografos, motivosTipoSeleccionados, responsable, comentarios);
-            
+            ordenInspeccionSeleccionada.ponerSismografoFueraDeServicio(sismografos, motivosTipoSeleccionados,
+                    responsable, comentarios);
+
             // Actualizar sismógrafo en BD
             String idSismografo = ordenInspeccionSeleccionada.getIdSismografo();
             Sismografo sismografo = sismografoRepo.findByIdentificador(idSismografo)
@@ -211,18 +233,22 @@ public class GestorCerrarOrdenInspeccion {
     }
 
     public List<String> buscarResponsablesReparacion() {
-        // Buscar empleados responsables de reparación desde BD
-        List<Empleado> responsables = empleadoRepo.findResponsablesReparacion();
+        // Buscar todos los empleados desde BD
+        List<Empleado> todosLosEmpleados = empleadoRepo.findAll();
         List<String> mailsResponsables = new ArrayList<>();
-        
-        for (Empleado empleado : responsables) {
-            mailsResponsables.add(empleado.obtenerMail());
+
+        // Para cada empleado, preguntarle si es responsable de reparación
+        for (Empleado empleado : todosLosEmpleados) {
+            if (empleado.esResponsableReparacion()) {
+                mailsResponsables.add(empleado.obtenerMail());
+            }
         }
-        
+
         return mailsResponsables;
     }
 
-    public void notificar(String idSismografo, Estado estado, LocalDateTime fechaHoraRegistro,  Map<MotivoTipo, String> motivosYComentarios) {
+    public void notificar(String idSismografo, Estado estado, LocalDateTime fechaHoraRegistro,
+            Map<MotivoTipo, String> motivosYComentarios) {
 
         // 1. Notificar por mail a los responsables
         List<String> mailsResponsables = buscarResponsablesReparacion();
@@ -247,7 +273,6 @@ public class GestorCerrarOrdenInspeccion {
                 idSismografo,
                 estado.getNombreEstado(),
                 fechaHoraRegistro,
-                motivosYComentarios
-        );
+                motivosYComentarios);
     }
 }

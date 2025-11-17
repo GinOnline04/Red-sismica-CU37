@@ -63,3 +63,7 @@ INSERT INTO ordenes_inspeccion (id, numero_orden, fecha_hora_inicio, fecha_hora_
 -- SESIONES (sesión activa para pruebas)
 INSERT INTO sesiones (ID, FECHAINICIO, FECHAFIN, USUARIO_ID) VALUES 
 (1, TIMESTAMP '2025-11-17 08:00:00', NULL, 1);
+
+-- ESTADOS DE ÓRDENES DE INSPECCIÓN
+INSERT INTO estados_orden_inspeccion (id, nombre_estado) VALUES 
+(1, 'COMPLETAMENTE_REALIZADA');
