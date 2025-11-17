@@ -1,17 +1,38 @@
 package entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "cambios_estado")
 public class CambioEstado {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     private String nombreEstado;
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
 
+    @ManyToOne
+    @JoinColumn(name = "responsable_id")
     private Empleado responsable;
+    
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "cambio_estado_id")
     private List<MotivoFueraServicio> motivos;
+    
+    @ManyToOne
+    @JoinColumn(name = "estado_id", nullable = false)
     private Estado estado;
+
+    // Constructor sin argumentos para JPA
+    public CambioEstado() {
+        this.motivos = new ArrayList<>();
+    }
 
     public CambioEstado(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin,
                         Empleado responsable, Estado estado) {
@@ -21,6 +42,10 @@ public class CambioEstado {
         this.motivos = new ArrayList<MotivoFueraServicio>();
         this.estado = estado;
         this.nombreEstado = estado.getNombreEstado();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setFechaHoraFin(LocalDateTime fechaHoraFin) {
@@ -39,6 +64,7 @@ public class CambioEstado {
         MotivoFueraServicio nuevoMotivo = new MotivoFueraServicio(comentario, motivo);
         motivos.add(nuevoMotivo);
     }
+    
     public void setMotivos(List<MotivoTipo> motivos, List<String> comentarios) {
         if (motivos == null || comentarios == null) {
             throw new IllegalArgumentException("Las listas no pueden ser nulas.");
@@ -54,5 +80,4 @@ public class CambioEstado {
             crearMotivoFueraSerivicio(comentario, motivo);
         }
     }
-
 }

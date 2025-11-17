@@ -1,21 +1,46 @@
 package entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "ordenes_inspeccion")
 public class OrdenDeInspeccion {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFinalizacion;
     private LocalDateTime fechaHoraCierre;
+    
+    @Column(nullable = false, unique = true)
     private String numeroOrden;
+    
+    @Column(length = 2000)
     private String observacionCliente;
 
+    @ManyToOne
+    @JoinColumn(name = "empleado_id", nullable = false)
     private Empleado empleado;
+    
+    @ManyToOne
+    @JoinColumn(name = "estacion_id", nullable = false)
     private EstacionSismologica estacion;
+    
+    @ManyToOne
+    @JoinColumn(name = "estado_id", nullable = false)
     private Estado estado;
 
-    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFinalizacion, Empleado empleado, EstacionSismologica estacion, Estado estado) {
+    // Constructor sin argumentos para JPA
+    public OrdenDeInspeccion() {
+    }
+
+    public OrdenDeInspeccion(String numeroOrden, LocalDateTime fechaHoraInicio, 
+                             LocalDateTime fechaHoraFinalizacion, Empleado empleado, 
+                             EstacionSismologica estacion, Estado estado) {
         this.numeroOrden = numeroOrden;
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFinalizacion = fechaHoraFinalizacion;
@@ -25,6 +50,10 @@ public class OrdenDeInspeccion {
     }
 
     // === Getters ===
+
+    public Long getId() {
+        return id;
+    }
 
     public LocalDateTime getFechaHoraInicio() {
         return fechaHoraInicio;
@@ -98,7 +127,8 @@ public class OrdenDeInspeccion {
         setEstado(nuevoEstado);
     }
 
-    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable, List<String> comentarios) {
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, 
+                                                Empleado responsable, List<String> comentarios) {
         estacion.ponerSismografoFueraDeServicio(sismografos, motivos, responsable, comentarios);
     }
 }

@@ -4,10 +4,12 @@ import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsolePlugin;
 import control.GestorCerrarOrdenInspeccion;
 import entity.*;
+import repository.UsuarioRepository;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.constant.DynamicCallSiteDesc;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,14 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.setLayout(new BorderLayout());
 
         JButton botonCerrarOrden = new JButton("Cerrar Orden de Inspección");
-        botonCerrarOrden.addActionListener(e -> seleccionOpcionCerrarOrdenInspeccion());
+        botonCerrarOrden.addActionListener(e -> {
+            // Cargar usuario y crear sesión para iniciar el flujo
+            repository.UsuarioRepository usuarioRepo = new repository.UsuarioRepository();
+            entity.Usuario usuario = usuarioRepo.findByNombreUsuario("lucia.g")
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            entity.Sesion sesion = new entity.Sesion(usuario, java.time.LocalDateTime.now());
+            seleccionOpcionCerrarOrdenInspeccion(sesion);
+        });
 
         JPanel panelBoton = new JPanel();
         panelBoton.add(botonCerrarOrden);
@@ -38,11 +47,11 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         this.getContentPane().add(panelPrincipal, BorderLayout.CENTER);
     }
 
-    public void seleccionOpcionCerrarOrdenInspeccion() {
-        habilitarPantalla();
+    public void seleccionOpcionCerrarOrdenInspeccion(Sesion sesion) {
+        habilitarPantalla(sesion);
     }
 
-    public void habilitarPantalla() {
+    public void habilitarPantalla(Sesion sesion) {
         panelPrincipal.removeAll(); //Limpia pantalla
         JLabel titulo = new JLabel("Esperando Ordenes de Inspección...", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 16));
@@ -51,7 +60,7 @@ public class InterfazCerrarOrdenInspeccion extends JFrame {
         panelPrincipal.add(titulo, BorderLayout.CENTER);
         panelPrincipal.revalidate();
         panelPrincipal.repaint();
-        gestor = new GestorCerrarOrdenInspeccion(this, interfazNotificacionMail, interfazMonitorCCRS);
+        gestor = new GestorCerrarOrdenInspeccion(this, interfazNotificacionMail, interfazMonitorCCRS, sesion);
         gestor.iniciarCierreOrdenInspeccion();
     }
 

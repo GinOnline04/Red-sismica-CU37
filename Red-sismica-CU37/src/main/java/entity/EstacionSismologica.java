@@ -1,19 +1,44 @@
 package entity;
 
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+@Entity
+@Table(name = "estaciones_sismologicas")
 public class EstacionSismologica {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true)
     private int codigoEstacion;
+    
     private String documentoCertificacionAdq;
+    
+    @Temporal(TemporalType.DATE)
     private Date fechaSolicitudCertificacion;
+    
     private double latitud;
     private double longitud;
+    
+    @Column(nullable = false)
     private String nombreEstacion;
+    
     private int nroCertificacionAdquisicion;
+    
+    @OneToOne
+    @JoinColumn(name = "sismografo_id")
     private Sismografo sismografo;
 
-    public EstacionSismologica(int codigoEstacion, String documentoCertificacionAdq, Date fechaSolicitudCertificacion, double latitud, double longitud, String nombreEstacion, int nroCertificacionAdquisicion, Sismografo sismografo) {
+    // Constructor sin argumentos para JPA
+    public EstacionSismologica() {
+    }
+
+    public EstacionSismologica(int codigoEstacion, String documentoCertificacionAdq, 
+                               Date fechaSolicitudCertificacion, double latitud, double longitud, 
+                               String nombreEstacion, int nroCertificacionAdquisicion, Sismografo sismografo) {
         this.codigoEstacion = codigoEstacion;
         this.documentoCertificacionAdq = documentoCertificacionAdq;
         this.fechaSolicitudCertificacion = fechaSolicitudCertificacion;
@@ -22,6 +47,10 @@ public class EstacionSismologica {
         this.nombreEstacion = nombreEstacion;
         this.nroCertificacionAdquisicion = nroCertificacionAdquisicion;
         this.sismografo = sismografo;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public int getCodigoEstacion() {
@@ -36,7 +65,8 @@ public class EstacionSismologica {
         return sismografo.getIdentificadorSismografo();
     }
 
-    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, Empleado responsable, List<String> comentarios) {
+    public void ponerSismografoFueraDeServicio(List<Sismografo> sismografos, List<MotivoTipo> motivos, 
+                                                Empleado responsable, List<String> comentarios) {
         for (Sismografo sismografo : sismografos) {
             if (sismografo.getIdentificadorSismografo().equals(this.getIdentificadorSismografo())) {
                 sismografo.fueraDeServicio(motivos, responsable, comentarios);

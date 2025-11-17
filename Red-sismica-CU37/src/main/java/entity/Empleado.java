@@ -1,12 +1,33 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "empleados")
 public class Empleado {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
     private String apellido;
+    
+    @Column(nullable = false, unique = true)
     private String mail;
+    
+    @Column(nullable = false)
     private String nombre;
+    
     private String telefono;
 
+    @ManyToOne
+    @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
+
+    // Constructor sin argumentos para JPA
+    public Empleado() {
+    }
 
     public Empleado(String nombre, String apellido, String mail, String telefono, Rol rol) {
         this.nombre = nombre;
@@ -14,6 +35,10 @@ public class Empleado {
         this.mail = mail;
         this.telefono = telefono;
         this.rol = rol;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getApellido() {
